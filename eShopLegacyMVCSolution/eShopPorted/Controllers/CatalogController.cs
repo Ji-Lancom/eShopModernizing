@@ -107,6 +107,12 @@ namespace eShopPorted.Controllers
             return RedirectToAction("Index");
         }
 
+        [Microsoft.AspNetCore.Mvc.ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+        public ActionResult Error()
+        {
+            return View("Error");
+        }
+
         protected override void Dispose(bool disposing)
         {
             _logger.LogDebug("Now disposing");
