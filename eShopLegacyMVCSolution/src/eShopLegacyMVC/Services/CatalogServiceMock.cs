@@ -1,15 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using eShopLegacyMVC.Models;
 using eShopLegacyMVC.Models.Infrastructure;
 using eShopLegacyMVC.ViewModel;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace eShopLegacyMVC.Services
 {
     public class CatalogServiceMock : ICatalogService
     {
-        private List<CatalogItem> catalogItems;
+        private readonly List<CatalogItem> catalogItems;
 
         public CatalogServiceMock()
         {
@@ -19,31 +19,14 @@ namespace eShopLegacyMVC.Services
         public PaginatedItemsViewModel<CatalogItem> GetCatalogItemsPaginated(int pageSize = 10, int pageIndex = 0)
         {
             var items = ComposeCatalogItems(catalogItems);
-            
-            var itemsOnPage = items
-                .OrderBy(c => c.Id)
-                .Skip(pageSize * pageIndex)
-                .Take(pageSize)
-                .ToList();
-
-            return new PaginatedItemsViewModel<CatalogItem>(
-                pageIndex, pageSize, items.Count, itemsOnPage);
+            var itemsOnPage = items.OrderBy(c => c.Id).Skip(pageSize * pageIndex).Take(pageSize).ToList();
+            return new PaginatedItemsViewModel<CatalogItem>(pageIndex, pageSize, items.Count, itemsOnPage);
         }
 
-        public CatalogItem FindCatalogItem(int id)
-        {
-            return catalogItems.FirstOrDefault(x => x.Id == id);
-        }
+        public CatalogItem? FindCatalogItem(int id) => catalogItems.FirstOrDefault(x => x.Id == id);
 
-        public IEnumerable<CatalogType> GetCatalogTypes()
-        {
-            return PreconfiguredData.GetPreconfiguredCatalogTypes();
-        }
-
-        public IEnumerable<CatalogBrand> GetCatalogBrands()
-        {
-            return PreconfiguredData.GetPreconfiguredCatalogBrands();
-        }
+        public IEnumerable<CatalogType> GetCatalogTypes() => PreconfiguredData.GetPreconfiguredCatalogTypes();
+        public IEnumerable<CatalogBrand> GetCatalogBrands() => PreconfiguredData.GetPreconfiguredCatalogBrands();
 
         public void CreateCatalogItem(CatalogItem catalogItem)
         {
@@ -56,29 +39,19 @@ namespace eShopLegacyMVC.Services
         {
             var originalItem = FindCatalogItem(modifiedItem.Id);
             if (originalItem != null)
-            {
                 catalogItems[catalogItems.IndexOf(originalItem)] = modifiedItem;
-            }
         }
 
-        public void RemoveCatalogItem(CatalogItem catalogItem)
-        {
-            catalogItems.Remove(catalogItem);
-        }
+        public void RemoveCatalogItem(CatalogItem catalogItem) => catalogItems.Remove(catalogItem);
+        public void Dispose() { }
 
-        public void Dispose()
+        private static List<CatalogItem> ComposeCatalogItems(List<CatalogItem> items)
         {
-        }
-
-        private List<CatalogItem> ComposeCatalogItems(List<CatalogItem> items)
-        {
-            var catalogTypes = PreconfiguredData.GetPreconfiguredCatalogTypes();
-            var catalogBrands = PreconfiguredData.GetPreconfiguredCatalogBrands();
+            var catalogTypes = PreconfiguredData.GetPreconfiguredCatalogTypes().ToList();
+            var catalogBrands = PreconfiguredData.GetPreconfiguredCatalogBrands().ToList();
             items.ForEach(i => i.CatalogBrand = catalogBrands.First(b => b.Id == i.CatalogBrandId));
             items.ForEach(i => i.CatalogType = catalogTypes.First(b => b.Id == i.CatalogTypeId));
-
             return items;
-            ;
         }
     }
 }

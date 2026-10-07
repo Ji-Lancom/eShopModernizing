@@ -1,13 +1,4 @@
-﻿using System.Web;
-using System.Web.Mvc;
-
+// Global filters are registered in Program.cs / controller attributes in ASP.NET Core.
 namespace eShopLegacyMVC
 {
-    public class FilterConfig
-    {
-        public static void RegisterGlobalFilters(GlobalFilterCollection filters)
-        {
-            filters.Add(new HandleErrorAttribute());
-        }
-    }
 }
